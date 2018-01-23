@@ -3,6 +3,25 @@
 
     <h1>Datepicker Examples</h1>
 
+
+    <div class="example">
+      <h3>Highlighting Ranges</h3>
+      <code>
+        &lt;datepicker :highlighted="highlighted"&gt;&lt;/datepicker&gt;
+      </code>
+      <div class="settings">
+        <h5>Settings</h5>
+        <div class="form-group">
+          <label>Highlight to:</label>
+          <datepicker :inline="true" v-on:selected="highlightTo"></datepicker>
+        </div>
+        <pre>highlighted: {{ highlighted }}</pre>
+
+        <h5>Resulting Date picker</h5>
+        <datepicker :inline="true" :highlighted="highlighted"></datepicker>
+      </div>
+    </div>
+
     <div class="example">
       <h3>Default datepicker</h3>
       <datepicker placeholder="Select Date"></datepicker>
@@ -283,6 +302,13 @@ export default {
     }
   },
   methods: {
+
+    setWeekRange (date) {
+      const dayInMillisecs = 86400000
+      var dateCode = Date.parse(date)
+      var rangeStartDate = new Date(dateCode - (6 * dayInMillisecs))
+      return rangeStartDate
+    },
     highlightTo (val) {
       if (typeof this.highlighted.to === 'undefined') {
         this.highlighted = {
@@ -292,6 +318,7 @@ export default {
         }
       }
       this.highlighted.to = val
+      this.highlighted.from = this.setWeekRange(val)
     },
     highlightFrom (val) {
       if (typeof this.highlighted.from === 'undefined') {
