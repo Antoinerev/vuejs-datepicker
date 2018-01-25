@@ -1,10 +1,11 @@
 import Vue from 'vue'
-import Demo from './Demo'
+import Custom from './Custom'
+// import Demo from './Demo'
 
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  render: h => h(Demo)
+  render: h => h(Custom)
 })
