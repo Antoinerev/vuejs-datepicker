@@ -12,15 +12,19 @@
       <div class="settings">
         <h5>Settings</h5>
         <div class="form-group">
-          <label>Format</label>
+          <label>Plage</label>
           <select v-model="nbOfDays">
             <option value="2" selected>Hier</option>
             <option value="7">7 derniers jours</option>
             <option value="30">30 derniers jours</option>
             <option value="90">90 derniers jours</option>
             <option value="365">365 derniers jours</option>
+            <option disabled>──────────</option>
+            <option value="0">Période personnalisée</option>
           </select>
         </div>
+        From :<input placeholder="01/01/2018" :class="isCustomRange ? '' : 'hidden' " v-model="highlighted.from"></input>
+        To :<input placeholder="15/01/2018" :class="isCustomRange ? '' : 'hidden' " v-model="highlighted.to"></input>
         <div class="form-group">
           <label>Highlight to:</label>
           <datepicker :inline="true" v-on:selected="highlightTo" :highlighted="highlighted"  :open-date="openDate"></datepicker>
@@ -37,6 +41,7 @@
 <script>
 import Datepicker from '@/components/Datepicker'
 import DateLanguages from '@/utils/DateLanguages'
+// import DateUtils from '@/utils/DateUtils.js'
 
 const state = {
   date1: new Date()
@@ -49,7 +54,7 @@ export default {
   },
   data () {
     return {
-      format: 'd MMMM yyyy',
+      format: 'd MMMM yyyy', // 'dd/MM/yyyy',
       disabled: {},
       openDate: null,
       disabledFn: {
@@ -82,8 +87,12 @@ export default {
       this.highlightTo(this.highlighted.to)
     }
   },
+  computed: {
+    isCustomRange () {
+      return this.nbOfDays === '0'
+    }
+  },
   methods: {
-
     setWeekRange (date) {
       const dayInMillisecs = 86400000
       var dateCode = Date.parse(date)
@@ -106,9 +115,11 @@ export default {
         }
       }
       this.highlighted = {
+        // to: DateUtils.formatDate(val, this.format),
+        // from: DateUtils.formatDate(this.setRangeDays(val, this.nbOfDays), this.format),
+        RangeInDays: this.nbOfDays,
         to: val,
-        from: this.setRangeDays(val, this.nbOfDays),
-        RangeInDays: this.nbOfDays
+        from: this.nbOfDays > 0 ? this.setRangeDays(val, this.nbOfDays) : this.highlighted.from
       }
     },
     highlightFrom (val) {
