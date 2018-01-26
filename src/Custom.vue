@@ -9,11 +9,10 @@
         <span>highlighted: {{ highlighted }}</span>
         <span>openDate: {{openDate}}</span>
       </pre>
-      <b-dropdown id="ddown1" text="Dropdown Button" class="m-md-2" width="400">
+      <b-dropdown id="ddown1" v-bind:text="dropdownTitle" class="m-md-2" width="400">
         <b-dropdown-item>
           <div class="example">
             <div class="settings">
-              <h5>Settings</h5>
               <div class="form-group">
                 <label>Plage</label>
                 <select v-model="nbOfDays">
@@ -27,11 +26,16 @@
                 </select>
               </div>
               <span v-show="isCustomRange">
-                From :<input placeholder="01/01/2018" v-model="highlighted.from"></input>
-                To :<input placeholder="15/01/2018" v-model="highlighted.to"></input>
+                From :<datepicker  v-on:selected="highlightFrom"
+                  :bootstrapStyling="true">
+                </datepicker>
+                To :<datepicker  v-on:selected="highlightTo"
+                  :bootstrapStyling="true">
+                </datepicker>
               </span>
               <div class="form-group">
-                <label>Highlight to:</label>
+                <hr>
+
                 <datepicker  v-on:selected="highlightTo"
                   :inline="true"
                   :highlighted="highlighted"
@@ -71,7 +75,7 @@ export default {
     return {
       format: 'd MMMM yyyy', // 'dd/MM/yyyy',
       disabled: {},
-      openDate: null,
+      openDate: new Date(),
       disabledFn: {
         customPredictor (date) {
           if (date.getDate() % 3 === 0) {
@@ -94,7 +98,8 @@ export default {
       language: 'en',
       languages: DateLanguages.translations,
       vModelExample: null,
-      nbOfDays: 2
+      nbOfDays: 2,
+      dropdownTitle: 'Choisissez une plage de temps'
     }
   },
   watch: {
@@ -136,6 +141,7 @@ export default {
         to: val,
         from: this.nbOfDays > 0 ? this.setRangeDays(val, this.nbOfDays) : this.highlighted.from
       }
+      console.log('highlightTo')
     },
     highlightFrom (val) {
       if (typeof this.highlighted.from === 'undefined') {
@@ -146,6 +152,7 @@ export default {
         }
       }
       this.highlighted.from = val
+      console.log(val)
     },
     setHighlightedDays (elem) {
       if (elem.target.value === 'undefined') {
