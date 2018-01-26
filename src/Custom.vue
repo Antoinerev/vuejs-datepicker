@@ -54,11 +54,8 @@
 <script>
 import Datepicker from '@/components/Datepicker'
 import DateLanguages from '@/utils/DateLanguages'
+import DateUtils from '@/utils/DateUtils.js'
 import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown'
-import bModal from 'bootstrap-vue/es/components/modal/modal'
-// import BootstrapVue from 'bootstrap-vue'
-// import DateUtils from '@/utils/DateUtils.js'
-// Vue.use(Modal)
 
 const state = {
   date1: new Date()
@@ -68,8 +65,7 @@ export default {
   name: 'app',
   components: {
     Datepicker,
-    'b-modal': bModal,
-    'b-dropdown': bDropdown
+    bDropdown
   },
   data () {
     return {
@@ -98,8 +94,7 @@ export default {
       language: 'en',
       languages: DateLanguages.translations,
       vModelExample: null,
-      nbOfDays: 2,
-      dropdownTitle: 'Choisissez une plage de temps'
+      nbOfDays: 2
     }
   },
   watch: {
@@ -110,7 +105,15 @@ export default {
   computed: {
     isCustomRange () {
       return this.nbOfDays === '0'
+    },
+    dropdownTitle () {
+      if (this.highlighted.from === undefined) {
+        return 'Choisissez une plage de temps'
+      } else {
+        return DateUtils.formatDate(this.highlighted.from, 'dd MMM yyyy') + ' - ' + DateUtils.formatDate(this.highlighted.to, 'dd MMM yyyy')
+      }
     }
+
   },
   methods: {
     setWeekRange (date) {
@@ -141,7 +144,6 @@ export default {
         to: val,
         from: this.nbOfDays > 0 ? this.setRangeDays(val, this.nbOfDays) : this.highlighted.from
       }
-      console.log('highlightTo')
     },
     highlightFrom (val) {
       if (typeof this.highlighted.from === 'undefined') {
@@ -152,7 +154,6 @@ export default {
         }
       }
       this.highlighted.from = val
-      console.log(val)
     },
     setHighlightedDays (elem) {
       if (elem.target.value === 'undefined') {
