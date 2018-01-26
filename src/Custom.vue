@@ -1,39 +1,48 @@
 <template>
   <div id="app">
 
-    <h1>Datepicker Examples</h1>
+    <h1>Range Datepicker</h1>
 
 
-    <div class="example">
-      <h3>Highlighting Ranges</h3>
-      <code>
-        &lt;datepicker :highlighted="highlighted"&gt;&lt;/datepicker&gt;
-      </code>
-      <div class="settings">
-        <h5>Settings</h5>
-        <div class="form-group">
-          <label>Plage</label>
-          <select v-model="nbOfDays">
-            <option value="2" selected>Hier</option>
-            <option value="7">7 derniers jours</option>
-            <option value="30">30 derniers jours</option>
-            <option value="90">90 derniers jours</option>
-            <option value="365">365 derniers jours</option>
-            <option disabled>──────────</option>
-            <option value="0">Période personnalisée</option>
-          </select>
-        </div>
-        From :<input placeholder="01/01/2018" :class="isCustomRange ? '' : 'hidden' " v-model="highlighted.from"></input>
-        To :<input placeholder="15/01/2018" :class="isCustomRange ? '' : 'hidden' " v-model="highlighted.to"></input>
-        <div class="form-group">
-          <label>Highlight to:</label>
-          <datepicker :inline="true" v-on:selected="highlightTo" :highlighted="highlighted"  :open-date="openDate"></datepicker>
-        </div>
-        <pre>
-          <span>highlighted: {{ highlighted }}</span>
-          <span>openDate: {{openDate}}</span>
-        </pre>
-      </div>
+    <div>
+      <pre>
+        <span>highlighted: {{ highlighted }}</span>
+        <span>openDate: {{openDate}}</span>
+      </pre>
+      <b-dropdown id="ddown1" text="Dropdown Button" class="m-md-2" width="400">
+        <b-dropdown-item>
+          <div class="example">
+            <div class="settings">
+              <h5>Settings</h5>
+              <div class="form-group">
+                <label>Plage</label>
+                <select v-model="nbOfDays">
+                  <option value="2" selected>Hier</option>
+                  <option value="7">7 derniers jours</option>
+                  <option value="30">30 derniers jours</option>
+                  <option value="90">90 derniers jours</option>
+                  <option value="365">365 derniers jours</option>
+                  <option disabled>──────────</option>
+                  <option value="0">Période personnalisée</option>
+                </select>
+              </div>
+              <span v-show="isCustomRange">
+                From :<input placeholder="01/01/2018" v-model="highlighted.from"></input>
+                To :<input placeholder="15/01/2018" v-model="highlighted.to"></input>
+              </span>
+              <div class="form-group">
+                <label>Highlight to:</label>
+                <datepicker  v-on:selected="highlightTo"
+                  :inline="true"
+                  :highlighted="highlighted"
+                  :open-date="openDate"
+                  :bootstrapStyling="true">
+                </datepicker>
+              </div>
+            </div>
+          </div>
+        </b-dropdown-item>
+      </b-dropdown>
     </div>
   </div>
 </template>
@@ -41,7 +50,11 @@
 <script>
 import Datepicker from '@/components/Datepicker'
 import DateLanguages from '@/utils/DateLanguages'
+import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown'
+import bModal from 'bootstrap-vue/es/components/modal/modal'
+// import BootstrapVue from 'bootstrap-vue'
 // import DateUtils from '@/utils/DateUtils.js'
+// Vue.use(Modal)
 
 const state = {
   date1: new Date()
@@ -50,7 +63,9 @@ const state = {
 export default {
   name: 'app',
   components: {
-    Datepicker
+    Datepicker,
+    'b-modal': bModal,
+    'b-dropdown': bDropdown
   },
   data () {
     return {
@@ -180,7 +195,7 @@ export default {
 
 <style>
 
-@import url('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css');
+@import url('https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css');
 
 body {
     font-family: 'Helvetica Neue Light', Helvetica, sans-serif;
