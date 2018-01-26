@@ -52,7 +52,7 @@
               </b-dropdown>
             </b-btn>
             <b-btn class="m-md-2"  >
-              <b-dropdown id="ddown1" text="Semaine"  class="m-md-2" width="400">
+              <b-dropdown id="ddown2" text="Semaine"  class="m-md-2" width="400">
                 <b-dropdown-item>
                   <div class="example">
                     <div class="settings">
@@ -71,7 +71,27 @@
                 </b-dropdown-item>
               </b-dropdown>
             </b-btn>
-            <b-btn class="m-md-2">Mois</b-btn>
+            <b-btn class="m-md-2">
+              <b-dropdown id="ddown3" text="Mois"  class="m-md-2" width="400">
+                <b-dropdown-item>
+                  <div class="example">
+                    <div class="settings">
+                      <div class="form-group">
+                        <datepicker v-on:selected="highlightMonth"
+                          :inline="true"
+                          :highlighted="highlighted"
+                          :open-date="openDate"
+                          :bootstrapStyling="true"
+                          :minimumView="'day'"
+                          :maximumView="'month'"
+                          :initialView="'month'">
+                        </datepicker>
+                      </div>
+                    </div>
+                  </div>
+                </b-dropdown-item>
+              </b-dropdown>
+            </b-btn>
           </b-button-group>
       </b-button-toolbar>
     </div>
@@ -146,6 +166,15 @@ export default {
 
   },
   methods: {
+    highlightMonth (val) {
+      var year = val.getFullYear()
+      var month = val.getMonth()
+      this.highlighted = {
+        from: new Date(year, month, 1),
+        to: new Date(year, month + 1, 0)
+      }
+      console.log(this.highlighted.to)
+    },
     highlightWeek (val) {
       var dayOfWeek = val.getDay()
       if (dayOfWeek === 0) {
