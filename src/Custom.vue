@@ -9,44 +9,71 @@
         <span>highlighted: {{ highlighted }}</span>
         <span>openDate: {{openDate}}</span>
       </pre>
-      <b-dropdown id="ddown1" v-bind:text="dropdownTitle" class="m-md-2" width="400">
-        <b-dropdown-item>
-          <div class="example">
-            <div class="settings">
-              <div class="form-group">
-                <label>Plage</label>
-                <select v-model="nbOfDays">
-                  <option value="2" selected>Hier</option>
-                  <option value="7">7 derniers jours</option>
-                  <option value="30">30 derniers jours</option>
-                  <option value="90">90 derniers jours</option>
-                  <option value="365">365 derniers jours</option>
-                  <option disabled>──────────</option>
-                  <option value="0">Période personnalisée</option>
-                </select>
-              </div>
-              <span v-show="isCustomRange">
-                From :<datepicker  v-on:selected="highlightFrom"
-                  :bootstrapStyling="true">
-                </datepicker>
-                To :<datepicker  v-on:selected="highlightTo"
-                  :bootstrapStyling="true">
-                </datepicker>
-              </span>
-              <div class="form-group">
-                <hr>
+      <div class="btn btn-primary">{{dropdownTitle}}</div>
+      <b-button-toolbar key-nav aria-label="Toolbar with button groups">
+          <b-button-group class="mx-1">
+            <b-btn>
+              <b-dropdown id="ddown1" text="Plage" class="m-md-2" width="400">
+                <b-dropdown-item>
+                  <div class="example">
+                    <div class="settings">
+                      <div class="form-group">
+                        <select v-model="nbOfDays">
+                          <option value="2" selected>Hier</option>
+                          <option value="7">7 derniers jours</option>
+                          <option value="30">30 derniers jours</option>
+                          <option value="90">90 derniers jours</option>
+                          <option value="365">365 derniers jours</option>
+                          <option disabled>──────────</option>
+                          <option value="0">Période personnalisée</option>
+                        </select>
+                      </div>
+                      <span v-show="isCustomRange">
+                        From :<datepicker  v-on:selected="highlightFrom"
+                          :bootstrapStyling="true">
+                        </datepicker>
+                        To :<datepicker  v-on:selected="highlightTo"
+                          :bootstrapStyling="true">
+                        </datepicker>
+                      </span>
+                      <div class="form-group">
+                        <hr>
 
-                <datepicker  v-on:selected="highlightTo"
-                  :inline="true"
-                  :highlighted="highlighted"
-                  :open-date="openDate"
-                  :bootstrapStyling="true">
-                </datepicker>
-              </div>
-            </div>
-          </div>
-        </b-dropdown-item>
-      </b-dropdown>
+                        <datepicker  v-on:selected="highlightTo"
+                          :inline="true"
+                          :highlighted="highlighted"
+                          :open-date="openDate"
+                          :bootstrapStyling="true">
+                        </datepicker>
+                      </div>
+                    </div>
+                  </div>
+                </b-dropdown-item>
+              </b-dropdown>
+            </b-btn>
+            <b-btn class="m-md-2"  >
+              <b-dropdown id="ddown1" text="Semaine"  class="m-md-2" width="400">
+                <b-dropdown-item>
+                  <div class="example">
+                    <div class="settings">
+                      <div class="form-group">
+                        <datepicker  v-on:selected="highlightWeek"
+                          :inline="true"
+                          :highlighted="highlighted"
+                          :open-date="openDate"
+                          :bootstrapStyling="true"
+                          :minimumView="'day'"
+                          :maximumView="'day'">
+                        </datepicker>
+                      </div>
+                    </div>
+                  </div>
+                </b-dropdown-item>
+              </b-dropdown>
+            </b-btn>
+            <b-btn class="m-md-2">Mois</b-btn>
+          </b-button-group>
+      </b-button-toolbar>
     </div>
   </div>
 </template>
@@ -56,6 +83,7 @@ import Datepicker from '@/components/Datepicker'
 import DateLanguages from '@/utils/DateLanguages'
 import DateUtils from '@/utils/DateUtils.js'
 import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown'
+import bButtonToolbar from 'bootstrap-vue/es/components/button-toolbar/button-toolbar'
 
 const state = {
   date1: new Date()
@@ -65,7 +93,8 @@ export default {
   name: 'app',
   components: {
     Datepicker,
-    bDropdown
+    bDropdown,
+    bButtonToolbar
   },
   data () {
     return {
@@ -94,7 +123,8 @@ export default {
       language: 'en',
       languages: DateLanguages.translations,
       vModelExample: null,
-      nbOfDays: 2
+      nbOfDays: 2,
+      dayInMillisecs: 86400000
     }
   },
   watch: {
@@ -116,16 +146,23 @@ export default {
 
   },
   methods: {
-    setWeekRange (date) {
-      const dayInMillisecs = 86400000
-      var dateCode = Date.parse(date)
-      var rangeStartDate = new Date(dateCode - (6 * dayInMillisecs))
-      return rangeStartDate
+    highlightWeek (val) {
+      var dayOfWeek = val.getDay()
+      if (dayOfWeek === 0) {
+        this.highlighted = {
+          from: new Date(Date.parse(val) - 6 * this.dayInMillisecs),
+          to: val
+        }
+      } else {
+        this.highlighted = {
+          from: new Date(Date.parse(val) - (dayOfWeek - 1) * this.dayInMillisecs),
+          to: new Date(Date.parse(val) + (7 - dayOfWeek) * this.dayInMillisecs)
+        }
+      }
     },
     setRangeDays (date, nbOfDays) {
-      const dayInMillisecs = 86400000
       var dateCode = Date.parse(date)
-      var rangeStartDate = new Date(dateCode - ((nbOfDays - 1) * dayInMillisecs))
+      var rangeStartDate = new Date(dateCode - ((nbOfDays - 1) * this.dayInMillisecs))
       return rangeStartDate
     },
     highlightTo (val) {
