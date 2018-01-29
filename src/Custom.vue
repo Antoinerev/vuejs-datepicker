@@ -230,10 +230,7 @@ export default {
       }
     },
     setRangeDays (date) {
-      console.log(this.highlighted.to)
-      console.log('date : ' + date)
       var dateCode = Date.parse(date)
-      // var rangeStartDate =
       this.highlighted = {
         from: new Date(dateCode - ((this.presetRange - 1) * this.dayInMillisecs)),
         to: date
@@ -242,7 +239,6 @@ export default {
         first: new Date(dateCode - ((this.presetRange - 1) * this.dayInMillisecs)),
         last: date
       }
-      // return rangeStartDate
     },
     highlightTo (val) {
       if (typeof this.highlighted.to === 'undefined') {
