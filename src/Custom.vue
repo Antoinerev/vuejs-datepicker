@@ -7,19 +7,19 @@
     <div>
       <pre>
         <span>highlighted: {{ highlighted }}</span>
-        <span>openDate: {{openDate}}</span>
+        <span>presetRange: {{presetRange}}</span>
         <span>selected days: {{selectedDays.first.toDateString()}} >> {{selectedDays.last.toDateString()}}</span>
       </pre>
       <div class="btn btn-primary">{{dropdownTitle}}</div>
       <b-button-toolbar key-nav aria-label="Toolbar with button groups">
           <b-button-group class="mx-1">
             <b-btn>
-              <b-dropdown id="ddown1" text="Plage" class="m-md-2" width="400">
+              <b-dropdown id="ddown1" text="Plage" class="m-md-2" width="400" v-on:shown="highlightTo(selectedDays.last)">
                 <b-dropdown-item>
                   <div class="example">
                     <div class="settings">
                       <div class="form-group">
-                        <select v-model="nbOfDays">
+                        <select v-model="presetRange">
                           <option value="2" selected>Hier</option>
                           <option value="7">7 derniers jours</option>
                           <option value="30">30 derniers jours</option>
@@ -31,9 +31,13 @@
                       </div>
                       <span v-show="isCustomRange">
                         From :<datepicker  v-on:selected="highlightFrom"
+                          :open-date="selectedDays.from"
+                          :highlighted="highlighted"
                           :bootstrapStyling="true">
                         </datepicker>
                         To :<datepicker  v-on:selected="highlightTo"
+                          :open-date="selectedDays.last"
+                          :highlighted="highlighted"
                           :bootstrapStyling="true">
                         </datepicker>
                       </span>
@@ -169,18 +173,22 @@ export default {
       language: 'en',
       languages: DateLanguages.translations,
       vModelExample: null,
-      nbOfDays: 2,
+      presetRange: 2,
       dayInMillisecs: 86400000
     }
   },
   watch: {
-    nbOfDays () {
-      this.highlightTo(this.highlighted.to)
+    presetRange () {
+      if (this.presetRange > 0) {
+        this.highlightTo(new Date())
+      } else {
+        this.highlightTo(this.selectedDays.last)
+      }
     }
   },
   computed: {
     isCustomRange () {
-      return this.nbOfDays === '0'
+      return this.presetRange === '0'
     },
     dropdownTitle () {
       if (this.highlighted.from === undefined) {
@@ -221,26 +229,34 @@ export default {
         last: this.highlighted.to
       }
     },
-    setRangeDays (date, nbOfDays) {
+    setRangeDays (date) {
+      console.log(this.highlighted.to)
+      console.log('date : ' + date)
       var dateCode = Date.parse(date)
-      var rangeStartDate = new Date(dateCode - ((nbOfDays - 1) * this.dayInMillisecs))
-      return rangeStartDate
+      // var rangeStartDate =
+      this.highlighted = {
+        from: new Date(dateCode - ((this.presetRange - 1) * this.dayInMillisecs)),
+        to: date
+      }
+      this.selectedDays = {
+        first: new Date(dateCode - ((this.presetRange - 1) * this.dayInMillisecs)),
+        last: date
+      }
+      // return rangeStartDate
     },
     highlightTo (val) {
       if (typeof this.highlighted.to === 'undefined') {
         this.highlighted = {
           to: null,
           daysOfMonth: this.highlighted.daysOfMonth,
-          from: this.highlighted.from,
-          RangeInDays: this.nbOfDays
+          from: this.highlighted.from
         }
       }
-      this.highlighted = {
-        // to: DateUtils.formatDate(val, this.format),
-        // from: DateUtils.formatDate(this.setRangeDays(val, this.nbOfDays), this.format),
-        RangeInDays: this.nbOfDays,
-        to: val,
-        from: this.nbOfDays > 0 ? this.setRangeDays(val, this.nbOfDays) : this.highlighted.from
+      if (this.presetRange > 0) {
+        this.setRangeDays(val)
+      } else {
+        this.highlighted.to = val
+        this.selectedDays.last = val
       }
     },
     highlightFrom (val) {
@@ -252,6 +268,7 @@ export default {
         }
       }
       this.highlighted.from = val
+      this.selectedDays.first = val
     },
     setHighlightedDays (elem) {
       if (elem.target.value === 'undefined') {
