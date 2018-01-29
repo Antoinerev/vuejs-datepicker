@@ -8,6 +8,7 @@
       <pre>
         <span>highlighted: {{ highlighted }}</span>
         <span>openDate: {{openDate}}</span>
+        <span>selected days: {{selectedDays.first.toDateString()}} >> {{selectedDays.last.toDateString()}}</span>
       </pre>
       <div class="btn btn-primary">{{dropdownTitle}}</div>
       <b-button-toolbar key-nav aria-label="Toolbar with button groups">
@@ -92,6 +93,27 @@
                 </b-dropdown-item>
               </b-dropdown>
             </b-btn>
+            <b-btn class="m-md-2">
+              <b-dropdown id="ddown4" text="Trimestre"  class="m-md-2" width="400">
+                <b-dropdown-item>
+                  <div class="example">
+                    <div class="settings">
+                      <div class="form-group">
+                        <datepicker v-on:selected="highlightMonth"
+                          :inline="true"
+                          :highlighted="highlighted"
+                          :open-date="openDate"
+                          :bootstrapStyling="true"
+                          :minimumView="'day'"
+                          :maximumView="'month'"
+                          :initialView="'month'">
+                        </datepicker>
+                      </div>
+                    </div>
+                  </div>
+                </b-dropdown-item>
+              </b-dropdown>
+            </b-btn>
           </b-button-group>
       </b-button-toolbar>
     </div>
@@ -138,6 +160,10 @@ export default {
       highlighted: {
         to: new Date()
       },
+      selectedDays: {
+        first: new Date(),
+        last: new Date()
+      },
       eventMsg: null,
       state: state,
       language: 'en',
@@ -163,17 +189,19 @@ export default {
         return DateUtils.formatDate(this.highlighted.from, 'dd MMM yyyy') + ' - ' + DateUtils.formatDate(this.highlighted.to, 'dd MMM yyyy')
       }
     }
-
   },
   methods: {
     highlightMonth (val) {
       var year = val.getFullYear()
       var month = val.getMonth()
-      this.highlighted = {
-        from: new Date(year, month, 1),
-        to: new Date(year, month + 1, 0)
+      this.selectedDays = {
+        first: new Date(year, month, 1),
+        last: new Date(year, month + 1, 0)
       }
-      console.log(this.highlighted.to)
+      this.highlighted = {
+        from: this.selectedDays.first,
+        to: new Date(year, month + 1, 1)
+      }
     },
     highlightWeek (val) {
       var dayOfWeek = val.getDay()
@@ -187,6 +215,10 @@ export default {
           from: new Date(Date.parse(val) - (dayOfWeek - 1) * this.dayInMillisecs),
           to: new Date(Date.parse(val) + (7 - dayOfWeek) * this.dayInMillisecs)
         }
+      }
+      this.selectedDays = {
+        first: this.highlighted.from,
+        last: this.highlighted.to
       }
     },
     setRangeDays (date, nbOfDays) {
