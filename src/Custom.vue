@@ -103,14 +103,15 @@
                   <div class="example">
                     <div class="settings">
                       <div class="form-group">
-                        <datepicker v-on:selected="highlightMonth"
+                        <datepicker v-on:selected="highlightTrimester"
                           :inline="true"
                           :highlighted="highlighted"
                           :open-date="openDate"
                           :bootstrapStyling="true"
-                          :minimumView="'day'"
-                          :maximumView="'month'"
-                          :initialView="'month'">
+                          :minimumView="'month'"
+                          :maximumView="'year'"
+                          :initialView="'month'"
+                          :selectionRange="'trimester'">
                         </datepicker>
                       </div>
                     </div>
@@ -209,6 +210,31 @@ export default {
       this.highlighted = {
         from: this.selectedDays.first,
         to: new Date(year, month + 1, 1)
+      }
+    },
+    highlightTrimester (val) {
+      var year = val.getFullYear()
+      var month = val.getMonth()
+      var selectedMonthFirst = 0
+      if (month > 5) {
+        if (month > 8) {
+          selectedMonthFirst = 9
+        } else {
+          selectedMonthFirst = 6
+        }
+      } else {
+        if (month > 2) {
+          selectedMonthFirst = 3
+        }
+      }
+
+      this.selectedDays = {
+        first: new Date(year, selectedMonthFirst, 1),
+        last: new Date(year, selectedMonthFirst + 3, 0)
+      }
+      this.highlighted = {
+        from: this.selectedDays.first,
+        to: new Date(year, selectedMonthFirst + 3, 1)
       }
     },
     highlightWeek (val) {

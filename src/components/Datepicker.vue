@@ -148,6 +148,7 @@ export default {
     calendarButtonIconContent: String,
     bootstrapStyling: Boolean,
     initialView: String,
+    selectionRange: String,
     disabledPicker: Boolean,
     required: Boolean,
     minimumView: {
@@ -173,6 +174,7 @@ export default {
        * {Date}
        */
       selectedDate: null,
+      selectedMonths: {},
       /*
        * Flags to show calendar views
        * {Boolean}
@@ -424,6 +426,26 @@ export default {
       this.$emit('input', null)
       this.$emit('cleared')
     },
+    setTrimester (date) {
+      var year = date.getFullYear()
+      var month = date.getMonth()
+      var selectedMonthFirst = 0
+      if (month > 5) {
+        if (month > 8) {
+          selectedMonthFirst = 9
+        } else {
+          selectedMonthFirst = 6
+        }
+      } else {
+        if (month > 2) {
+          selectedMonthFirst = 3
+        }
+      }
+      this.selectedMonths = {
+        first: new Date(year, selectedMonthFirst, 1),
+        last: new Date(year, selectedMonthFirst + 3, 0)
+      }
+    },
     /**
      * @param {Object} day
      */
@@ -443,11 +465,11 @@ export default {
      * @param {Object} month
      */
     selectMonth (month) {
+      const date = new Date(month.timestamp)
       if (month.isDisabled) {
         return false
       }
 
-      const date = new Date(month.timestamp)
       if (this.allowedToShowView('day')) {
         this.setPageDate(date)
         this.$emit('changedMonth', month)
@@ -458,6 +480,7 @@ export default {
           this.close(true)
         }
       }
+      if (this.selectionRange === 'trimester') { this.setTrimester(date) }
     },
     /**
      * @param {Object} year
@@ -722,9 +745,16 @@ export default {
      * @return {Boolean}
      */
     isSelectedMonth (date) {
-      return (this.selectedDate &&
-        this.selectedDate.getFullYear() === date.getFullYear() &&
-        this.selectedDate.getMonth() === date.getMonth())
+      if (this.selectionRange === 'trimester') {
+        return (this.selectedMonths.first &&
+                  this.selectedMonths.first.getFullYear() === date.getFullYear() &&
+                  this.selectedMonths.first.getMonth() <= date.getMonth() &&
+                  this.selectedMonths.last.getMonth() >= date.getMonth())
+      } else {
+        return (this.selectedDate &&
+          this.selectedDate.getFullYear() === date.getFullYear() &&
+          this.selectedDate.getMonth() === date.getMonth())
+      }
     },
     /**
      * Whether a month is disabled
@@ -844,6 +874,7 @@ export default {
       }
     },
     init () {
+      console.log(this.value)
       if (this.value) {
         this.setValue(this.value)
       }
