@@ -874,7 +874,6 @@ export default {
       }
     },
     init () {
-      console.log(this.value)
       if (this.value) {
         this.setValue(this.value)
       }
