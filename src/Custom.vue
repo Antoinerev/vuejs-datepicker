@@ -83,7 +83,7 @@
                           :highlighted="highlighted"
                           :open-date="openDate"
                           :bootstrapStyling="true"
-                          :minimumView="'day'"
+                          :minimumView="'month'"
                           :maximumView="'month'"
                           :initialView="'month'">
                         </datepicker>
@@ -186,7 +186,7 @@ export default {
       if (this.highlighted.from === undefined) {
         return 'Choisissez une plage de temps'
       } else {
-        return DateUtils.formatDate(this.highlighted.from, 'dd MMM yyyy') + ' - ' + DateUtils.formatDate(this.highlighted.to, 'dd MMM yyyy')
+        return DateUtils.formatDate(this.selectedDays.first, 'dd MMM yyyy') + ' - ' + DateUtils.formatDate(this.selectedDays.last, 'dd MMM yyyy')
       }
     }
   },

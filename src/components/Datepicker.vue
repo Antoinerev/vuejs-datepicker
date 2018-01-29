@@ -454,7 +454,9 @@ export default {
         this.showDayCalendar()
       } else {
         this.setDate(date)
-        this.close(true)
+        if (!this.isInline) {
+          this.close(true)
+        }
       }
     },
     /**
