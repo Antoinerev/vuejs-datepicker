@@ -119,6 +119,26 @@
                 </b-dropdown-item>
               </b-dropdown>
             </b-btn>
+            <b-btn class="m-md-2">
+              <b-dropdown id="ddown5" text="Année"  class="m-md-2" width="400">
+                <b-dropdown-item>
+                  <div class="example">
+                    <div class="settings">
+                      <div class="form-group">
+                        <datepicker v-on:selected="highlightYear"
+                          :inline="true"
+                          :highlighted="highlighted"
+                          :open-date="openDate"
+                          :bootstrapStyling="true"
+                          :minimumView="'year'"
+                          :maximumView="'year'">
+                        </datepicker>
+                      </div>
+                    </div>
+                  </div>
+                </b-dropdown-item>
+              </b-dropdown>
+            </b-btn>
           </b-button-group>
       </b-button-toolbar>
     </div>
@@ -200,6 +220,17 @@ export default {
     }
   },
   methods: {
+    highlightYear (val) {
+      var year = val.getFullYear()
+      this.selectedDays = {
+        first: new Date(year, 0, 1),
+        last: new Date(year + 1, 0, 0)
+      }
+      this.highlighted = {
+        from: this.selectedDays.first,
+        to: new Date(year + 1, 0, 1)
+      }
+    },
     highlightMonth (val) {
       var year = val.getFullYear()
       var month = val.getMonth()

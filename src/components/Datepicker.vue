@@ -497,7 +497,9 @@ export default {
         this.showMonthCalendar()
       } else {
         this.setDate(date)
-        this.close(true)
+        if (!this.isInline) {
+          this.close(true)
+        }
       }
     },
     /**
