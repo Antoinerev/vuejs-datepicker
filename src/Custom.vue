@@ -5,11 +5,6 @@
 
 
     <div>
-      <pre>
-        <span>highlighted: {{ highlighted }}</span>
-        <span>presetRange: {{presetRange}}</span>
-        <span>selected days: {{selectedDays.first.toDateString()}} >> {{selectedDays.last.toDateString()}}</span>
-      </pre>
       <div class="btn btn-primary">{{dropdownTitle}}</div>
       <b-button-toolbar key-nav aria-label="Toolbar with button groups">
           <b-button-group class="mx-1">
