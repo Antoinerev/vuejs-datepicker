@@ -5,11 +5,11 @@
 
 
     <div>
-      <div class="btn btn-primary">{{dropdownTitle}}</div>
+      <div class="btn btn-light"><span class="glyphicon glyphicon-calendar"></span> {{dropdownTitle}}</div>
       <b-button-toolbar key-nav aria-label="Toolbar with button groups">
           <b-button-group class="mx-1">
             <b-btn>
-              <b-dropdown id="ddown1" text="Plage" class="m-md-2" width="400" v-on:shown="highlightTo(selectedDays.last)">
+              <b-dropdown id="ddown1" text="Plage" class="m-md-2" v-on:shown="highlightTo(selectedDays.last)">
                 <b-dropdown-item>
                   <div class="example">
                     <div class="settings">
@@ -24,22 +24,26 @@
                           <option value="0">Période personnalisée</option>
                         </select>
                       </div>
-                      <span v-show="isCustomRange">
+                      <div v-show="isCustomRange">
                         From :<datepicker  v-on:selected="highlightFrom"
+                          language="fr"
                           :open-date="selectedDays.from"
                           :highlighted="highlighted"
                           :bootstrapStyling="true">
                         </datepicker>
-                        To :<datepicker  v-on:selected="highlightTo"
+                        <br>
+                        <br>To :<br><datepicker  v-on:selected="highlightTo"
+                          language="fr"
                           :open-date="selectedDays.last"
                           :highlighted="highlighted"
                           :bootstrapStyling="true">
                         </datepicker>
-                      </span>
+                      </div>
                       <div class="form-group">
                         <hr>
 
                         <datepicker  v-on:selected="highlightTo"
+                          language="fr"
                           :inline="true"
                           :highlighted="highlighted"
                           :open-date="openDate"
@@ -58,6 +62,7 @@
                     <div class="settings">
                       <div class="form-group">
                         <datepicker  v-on:selected="highlightWeek"
+                          language="fr"
                           :inline="true"
                           :highlighted="highlighted"
                           :open-date="openDate"
@@ -78,6 +83,7 @@
                     <div class="settings">
                       <div class="form-group">
                         <datepicker v-on:selected="highlightMonth"
+                          language="fr"
                           :inline="true"
                           :highlighted="highlighted"
                           :open-date="openDate"
@@ -99,6 +105,7 @@
                     <div class="settings">
                       <div class="form-group">
                         <datepicker v-on:selected="highlightTrimester"
+                          language="fr"
                           :inline="true"
                           :highlighted="highlighted"
                           :open-date="openDate"
@@ -121,6 +128,7 @@
                     <div class="settings">
                       <div class="form-group">
                         <datepicker v-on:selected="highlightYear"
+                          language="fr"
                           :inline="true"
                           :highlighted="highlighted"
                           :open-date="openDate"
@@ -365,8 +373,11 @@ export default {
 </script>
 
 <style>
-
+/* for the dropdown components */
 @import url('https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css');
+
+/* for the glyphicon */
+@import url('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css');
 
 body {
     font-family: 'Helvetica Neue Light', Helvetica, sans-serif;
