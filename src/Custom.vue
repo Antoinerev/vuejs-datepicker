@@ -9,7 +9,7 @@
       <b-button-toolbar key-nav aria-label="Toolbar with button groups">
           <b-button-group class="mx-1">
             <b-btn>
-              <b-dropdown id="ddown1" text="Plage" class="m-md-2" v-on:shown="highlightTo(selectedDays.last)">
+              <b-dropdown id="ddown1" text="Plage" class="m-md-2" v-on:shown="highlightTo(selectedDays.to)">
                 <b-dropdown-item>
                   <div class="example">
                     <div class="settings">
@@ -34,7 +34,7 @@
                         <br>
                         <br>To :<br><datepicker  v-on:selected="highlightTo"
                           language="fr"
-                          :open-date="selectedDays.last"
+                          :open-date="selectedDays.to"
                           :highlighted="highlighted"
                           :bootstrapStyling="true">
                         </datepicker>
@@ -56,7 +56,7 @@
               </b-dropdown>
             </b-btn>
             <b-btn class="m-md-2"  >
-              <b-dropdown id="ddown2" text="Semaine"  class="m-md-2" width="400">
+              <b-dropdown id="ddown2" text="Semaine"  class="m-md-2">
                 <b-dropdown-item>
                   <div class="example">
                     <div class="settings">
@@ -77,7 +77,7 @@
               </b-dropdown>
             </b-btn>
             <b-btn class="m-md-2">
-              <b-dropdown id="ddown3" text="Mois"  class="m-md-2" width="400">
+              <b-dropdown id="ddown3" text="Mois"  class="m-md-2">
                 <b-dropdown-item>
                   <div class="example">
                     <div class="settings">
@@ -99,12 +99,12 @@
               </b-dropdown>
             </b-btn>
             <b-btn class="m-md-2">
-              <b-dropdown id="ddown4" text="Trimestre"  class="m-md-2" width="400">
+              <b-dropdown id="ddown4" text="Trimestre"  class="m-md-2">
                 <b-dropdown-item>
                   <div class="example">
                     <div class="settings">
                       <div class="form-group">
-                        <datepicker v-on:selected="highlightTrimester"
+                        <datepicker @update:selectedDays="selectedRange => selectedDays = selectedRange"
                           language="fr"
                           :inline="true"
                           :highlighted="highlighted"
@@ -122,12 +122,35 @@
               </b-dropdown>
             </b-btn>
             <b-btn class="m-md-2">
-              <b-dropdown id="ddown5" text="Année"  class="m-md-2" width="400">
+              <b-dropdown id="ddown5" text="Semestre"  class="m-md-2">
                 <b-dropdown-item>
                   <div class="example">
                     <div class="settings">
                       <div class="form-group">
-                        <datepicker v-on:selected="highlightYear"
+                        <datepicker @update:selectedDays="selectedRange => selectedDays = selectedRange"
+                          language="fr"
+                          :inline="true"
+                          :highlighted="highlighted"
+                          :open-date="openDate"
+                          :bootstrapStyling="true"
+                          :minimumView="'month'"
+                          :maximumView="'year'"
+                          :initialView="'month'"
+                          :selectionRange="'semester'">
+                        </datepicker>
+                      </div>
+                    </div>
+                  </div>
+                </b-dropdown-item>
+              </b-dropdown>
+            </b-btn>
+            <b-btn class="m-md-2">
+              <b-dropdown id="ddown6" text="Année"  class="m-md-2">
+                <b-dropdown-item>
+                  <div class="example">
+                    <div class="settings">
+                      <div class="form-group">
+                        <datepicker
                           language="fr"
                           :inline="true"
                           :highlighted="highlighted"
@@ -189,8 +212,8 @@ export default {
         to: new Date()
       },
       selectedDays: {
-        first: new Date(),
-        last: new Date()
+        from: new Date(),
+        to: new Date()
       },
       eventMsg: null,
       state: state,
@@ -206,7 +229,13 @@ export default {
       if (this.presetRange > 0) {
         this.highlightTo(new Date())
       } else {
-        this.highlightTo(this.selectedDays.last)
+        this.highlightTo(this.selectedDays.to)
+      }
+    },
+    selectedDays () {
+      this.highlighted = {
+        from: this.selectedDays.from,
+        to: this.selectedDays.to // new Date(year, selectedMonthFirst + 3, 1)
       }
     }
   },
@@ -215,10 +244,10 @@ export default {
       return this.presetRange === '0'
     },
     dropdownTitle () {
-      if (this.highlighted.from === undefined) {
+      if (this.selectedDays.from === undefined) {
         return 'Choisissez une plage de temps'
       } else {
-        return DateUtils.formatDate(this.selectedDays.first, 'dd MMM yyyy') + ' - ' + DateUtils.formatDate(this.selectedDays.last, 'dd MMM yyyy')
+        return DateUtils.formatDate(this.selectedDays.from, 'dd MMM yyyy') + ' - ' + DateUtils.formatDate(this.selectedDays.to, 'dd MMM yyyy')
       }
     }
   },
@@ -226,11 +255,11 @@ export default {
     highlightYear (val) {
       var year = val.getFullYear()
       this.selectedDays = {
-        first: new Date(year, 0, 1),
-        last: new Date(year + 1, 0, 0)
+        from: new Date(year, 0, 1),
+        to: new Date(year + 1, 0, 0)
       }
       this.highlighted = {
-        from: this.selectedDays.first,
+        from: this.selectedDays.from,
         to: new Date(year + 1, 0, 1)
       }
     },
@@ -238,37 +267,12 @@ export default {
       var year = val.getFullYear()
       var month = val.getMonth()
       this.selectedDays = {
-        first: new Date(year, month, 1),
-        last: new Date(year, month + 1, 0)
+        from: new Date(year, month, 1),
+        to: new Date(year, month + 1, 0)
       }
       this.highlighted = {
-        from: this.selectedDays.first,
+        from: this.selectedDays.from,
         to: new Date(year, month + 1, 1)
-      }
-    },
-    highlightTrimester (val) {
-      var year = val.getFullYear()
-      var month = val.getMonth()
-      var selectedMonthFirst = 0
-      if (month > 5) {
-        if (month > 8) {
-          selectedMonthFirst = 9
-        } else {
-          selectedMonthFirst = 6
-        }
-      } else {
-        if (month > 2) {
-          selectedMonthFirst = 3
-        }
-      }
-
-      this.selectedDays = {
-        first: new Date(year, selectedMonthFirst, 1),
-        last: new Date(year, selectedMonthFirst + 3, 0)
-      }
-      this.highlighted = {
-        from: this.selectedDays.first,
-        to: new Date(year, selectedMonthFirst + 3, 1)
       }
     },
     highlightWeek (val) {
@@ -285,8 +289,8 @@ export default {
         }
       }
       this.selectedDays = {
-        first: this.highlighted.from,
-        last: this.highlighted.to
+        from: this.highlighted.from,
+        to: this.highlighted.to
       }
     },
     setRangeDays (date) {
@@ -296,8 +300,8 @@ export default {
         to: date
       }
       this.selectedDays = {
-        first: new Date(dateCode - ((this.presetRange - 1) * this.dayInMillisecs)),
-        last: date
+        from: new Date(dateCode - ((this.presetRange - 1) * this.dayInMillisecs)),
+        to: date
       }
     },
     highlightTo (val) {
@@ -312,7 +316,7 @@ export default {
         this.setRangeDays(val)
       } else {
         this.highlighted.to = val
-        this.selectedDays.last = val
+        this.selectedDays.to = val
       }
     },
     highlightFrom (val) {
@@ -324,7 +328,7 @@ export default {
         }
       }
       this.highlighted.from = val
-      this.selectedDays.first = val
+      this.selectedDays.from = val
     },
     setHighlightedDays (elem) {
       if (elem.target.value === 'undefined') {
