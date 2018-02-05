@@ -3,9 +3,6 @@
 
     <h1>Range Datepicker</h1>
 
-    <pre>this.highlighted : {{this.highlighted}}</pre>
-    <pre>this.selectedDays : {{this.selectedDays}}</pre>
-
     <div>
       <div class="btn btn-light"><span class="glyphicon glyphicon-calendar"></span> {{dropdownTitle}}</div>
       <b-button-toolbar key-nav aria-label="Toolbar with button groups">
@@ -27,14 +24,14 @@
                         </select>
                       </div>
                       <div v-show="isCustomRange">
-                        From :<datepicker  v-model="selectedDays.from"
+                        From :<datepicker v-model="selectedDays.from" v-on:selected="highlightFrom"
                           language="fr"
                           :open-date="selectedDays.from"
                           :highlighted="highlighted"
                           :bootstrapStyling="true">
                         </datepicker>
                         <br>
-                        <br>To :<br><datepicker  v-model="selectedDays.to"
+                        <br>To :<br><datepicker v-model="selectedDays.to" v-on:selected="highlightTo"
                           language="fr"
                           :open-date="selectedDays.to"
                           :highlighted="highlighted"
@@ -229,15 +226,12 @@ export default {
   },
   watch: {
     presetRange () {
-      // if (this.presetRange > 0) {
-      //   this.highlightTo(new Date())
-      // } else {
-      this.selectRangeOfDays(this.selectedDays.to)
-      // }
+      if (this.presetRange > 0) {
+        this.selectRangeOfDays(this.selectedDays.to)
+      }
     },
     selectedDays () {
-      console.log('updated')
-      // this.highlightDaysRange(this.selectedDays.to)
+      this.highlightDaysRange(this.selectedDays.to)
     }
   },
   computed: {
@@ -259,10 +253,6 @@ export default {
         from: new Date(year, 0, 1),
         to: new Date(year, 11, 31)
       }
-      // this.highlighted = {
-      //   from: this.selectedDays.from,
-      //   to: new Date(year + 1, 0, 1)
-      // }
       this.highlightDaysRange(this.selectedDays.to)
     },
     highlightMonth (val) {
@@ -272,10 +262,6 @@ export default {
         from: new Date(year, month, 1),
         to: new Date(year, month + 1, 0)
       }
-      // this.highlighted = {
-      //   from: this.selectedDays.from,
-      //   to: new Date(year, month + 1, 1)
-      // }
       this.highlightDaysRange(this.selectedDays.to)
     },
     highlightDaysRange (endDate) {
@@ -286,38 +272,32 @@ export default {
     },
     selectRangeOfDays (val) {
       if (this.presetRange > 0) {
-        // this.highlightTo(val)
         this.selectedDays = {
           from: new Date(val.getFullYear(), val.getMonth(), val.getDate() - (this.presetRange - 1)),
           to: val
         }
       } else {
-        if (val > this.highlighted.active) {
-          this.selectedDays = {
-            from: this.highlighted.active,
-            to: val
+        if (val > this.selectedDays.from) {
+          if (val > this.selectedDays.to) {
+            this.selectedDays = {
+              from: this.selectedDays.from,
+              to: val
+            }
+          } else {
+            this.selectedDays = {
+              from: val,
+              to: this.selectedDays.from
+            }
           }
         } else {
           this.selectedDays = {
             from: val,
-            to: this.highlighted.active
+            to: this.selectedDays.to
           }
         }
       }
       this.highlightDaysRange(this.selectedDays.to)
-      this.highlighted.active = val
     },
-    // setRangeDays (date) {
-    //   var dateCode = Date.parse(date)
-    //   this.highlighted = {
-    //     from: new Date(dateCode - ((this.presetRange - 1) * this.dayInMillisecs)),
-    //     to: date
-    //   }
-    //   this.selectedDays = {
-    //     from: new Date(dateCode - ((this.presetRange - 1) * this.dayInMillisecs)),
-    //     to: date
-    //   }
-    // },
     highlightTo (val) {
       if (typeof this.highlighted.to === 'undefined') {
         this.highlighted = {
@@ -326,12 +306,8 @@ export default {
           from: this.highlighted.from
         }
       }
-      // if (this.presetRange > 0) {
-      //   // this.setRangeDays(val)
-      // } else {
-      //   // this.highlighted.to = val
+      this.highlighted.to = val
       this.selectedDays.to = val
-      // }
     },
     highlightFrom (val) {
       if (typeof this.highlighted.from === 'undefined') {
