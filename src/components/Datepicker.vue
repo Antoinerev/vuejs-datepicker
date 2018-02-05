@@ -148,7 +148,7 @@ export default {
     calendarButtonIconContent: String,
     bootstrapStyling: Boolean,
     initialView: String,
-    selectionRange: String,
+    dateSelectionRange: String,
     disabledPicker: Boolean,
     required: Boolean,
     minimumView: {
@@ -420,12 +420,34 @@ export default {
       this.$emit('selected', new Date(date))
       this.$emit('input', new Date(date))
     },
-    setRange (date) {
+    setDaysRange (timestamp) {
+      const date = new Date(timestamp)
+      const year = date.getFullYear()
+      const month = date.getMonth()
+      const day = date.getDate()
+      switch (this.dateSelectionRange) {
+        case 'week':
+          const dayOfWeek = date.getDay()
+          var startDayOffset = -6
+          var endDayOffset = 0
+          if (dayOfWeek !== 0) {
+            startDayOffset = 1 - dayOfWeek
+            endDayOffset = 7 - dayOfWeek
+          }
+          break
+      }
+      this.selectedRange = {
+        from: new Date(year, month, day + startDayOffset),
+        to: new Date(year, month, day + endDayOffset)
+      }
+      this.$emit('update:selectedDays', this.selectedRange)
+    },
+    setMonthsRange (date) {
       const year = date.getFullYear()
       const month = date.getMonth()
       var selectedFirstMonth = 0
       var monthsRange = 1
-      switch (this.selectionRange) {
+      switch (this.dateSelectionRange) {
         case 'trimester':
           monthsRange = 3
           if (month > 5) {
@@ -475,6 +497,9 @@ export default {
       } else {
         this.close(true)
       }
+      if (this.isDefined(this.dateSelectionRange)) {
+        this.setDaysRange(day.timestamp)
+      }
     },
     /**
      * @param {Object} month
@@ -495,9 +520,8 @@ export default {
           this.close(true)
         }
       }
-
-      if (this.isDefined(this.selectionRange)) {
-        this.setRange(date)
+      if (this.isDefined(this.dateSelectionRange)) {
+        this.setMonthsRange(date)
       }
     },
     /**
@@ -765,7 +789,7 @@ export default {
      * @return {Boolean}
      */
     isSelectedMonth (date) {
-      if (this.isDefined(this.selectionRange)) {
+      if (this.isDefined(this.dateSelectionRange)) {
         return (this.selectedRange.from &&
                   this.selectedRange.from.getFullYear() === date.getFullYear() &&
                   this.selectedRange.from.getMonth() <= date.getMonth() &&
