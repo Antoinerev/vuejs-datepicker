@@ -220,8 +220,7 @@ export default {
       language: 'en',
       languages: DateLanguages.translations,
       vModelExample: null,
-      presetRange: 2,
-      dayInMillisecs: 86400000
+      presetRange: 2
     }
   },
   watch: {
