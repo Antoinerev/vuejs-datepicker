@@ -3,7 +3,6 @@
 
     <h1>Range Datepicker</h1>
 
-
     <div>
       <div class="btn btn-light"><span class="glyphicon glyphicon-calendar"></span> {{dropdownTitle}}</div>
       <b-button-toolbar key-nav aria-label="Toolbar with button groups">
@@ -25,14 +24,14 @@
                         </select>
                       </div>
                       <div v-show="isCustomRange">
-                        From :<datepicker  v-on:selected="highlightFrom"
+                        From :<datepicker v-model="selectedDays.from" v-on:selected="highlightFrom"
                           language="fr"
                           :open-date="selectedDays.from"
                           :highlighted="highlighted"
                           :bootstrapStyling="true">
                         </datepicker>
                         <br>
-                        <br>To :<br><datepicker  v-on:selected="highlightTo"
+                        <br>To :<br><datepicker v-model="selectedDays.to" v-on:selected="highlightTo"
                           language="fr"
                           :open-date="selectedDays.to"
                           :highlighted="highlighted"
@@ -42,7 +41,7 @@
                       <div class="form-group">
                         <hr>
 
-                        <datepicker  v-on:selected="highlightTo"
+                        <datepicker  v-on:selected="selectRangeOfDays"
                           language="fr"
                           :inline="true"
                           :highlighted="highlighted"
@@ -61,14 +60,15 @@
                   <div class="example">
                     <div class="settings">
                       <div class="form-group">
-                        <datepicker  v-on:selected="highlightWeek"
+                        <datepicker  @update:selectedDays="selectedRange => selectedDays = selectedRange"
                           language="fr"
                           :inline="true"
                           :highlighted="highlighted"
                           :open-date="openDate"
                           :bootstrapStyling="true"
                           :minimumView="'day'"
-                          :maximumView="'day'">
+                          :maximumView="'day'"
+                          :dateSelectionRange="'week'">
                         </datepicker>
                       </div>
                     </div>
@@ -113,7 +113,7 @@
                           :minimumView="'month'"
                           :maximumView="'year'"
                           :initialView="'month'"
-                          :selectionRange="'trimester'">
+                          :dateSelectionRange="'trimester'">
                         </datepicker>
                       </div>
                     </div>
@@ -136,7 +136,7 @@
                           :minimumView="'month'"
                           :maximumView="'year'"
                           :initialView="'month'"
-                          :selectionRange="'semester'">
+                          :dateSelectionRange="'semester'">
                         </datepicker>
                       </div>
                     </div>
@@ -150,7 +150,7 @@
                   <div class="example">
                     <div class="settings">
                       <div class="form-group">
-                        <datepicker
+                        <datepicker v-on:selected="highlightYear"
                           language="fr"
                           :inline="true"
                           :highlighted="highlighted"
@@ -220,23 +220,17 @@ export default {
       language: 'en',
       languages: DateLanguages.translations,
       vModelExample: null,
-      presetRange: 2,
-      dayInMillisecs: 86400000
+      presetRange: 2
     }
   },
   watch: {
     presetRange () {
       if (this.presetRange > 0) {
-        this.highlightTo(new Date())
-      } else {
-        this.highlightTo(this.selectedDays.to)
+        this.selectRangeOfDays(this.selectedDays.to)
       }
     },
     selectedDays () {
-      this.highlighted = {
-        from: this.selectedDays.from,
-        to: this.selectedDays.to // new Date(year, selectedMonthFirst + 3, 1)
-      }
+      this.highlightDaysRange(this.selectedDays.to)
     }
   },
   computed: {
@@ -256,12 +250,9 @@ export default {
       var year = val.getFullYear()
       this.selectedDays = {
         from: new Date(year, 0, 1),
-        to: new Date(year + 1, 0, 0)
+        to: new Date(year, 11, 31)
       }
-      this.highlighted = {
-        from: this.selectedDays.from,
-        to: new Date(year + 1, 0, 1)
-      }
+      this.highlightDaysRange(this.selectedDays.to)
     },
     highlightMonth (val) {
       var year = val.getFullYear()
@@ -270,39 +261,41 @@ export default {
         from: new Date(year, month, 1),
         to: new Date(year, month + 1, 0)
       }
+      this.highlightDaysRange(this.selectedDays.to)
+    },
+    highlightDaysRange (endDate) {
       this.highlighted = {
         from: this.selectedDays.from,
-        to: new Date(year, month + 1, 1)
+        to: new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1)
       }
     },
-    highlightWeek (val) {
-      var dayOfWeek = val.getDay()
-      if (dayOfWeek === 0) {
-        this.highlighted = {
-          from: new Date(Date.parse(val) - 6 * this.dayInMillisecs),
+    selectRangeOfDays (val) {
+      if (this.presetRange > 0) {
+        this.selectedDays = {
+          from: new Date(val.getFullYear(), val.getMonth(), val.getDate() - (this.presetRange - 1)),
           to: val
         }
       } else {
-        this.highlighted = {
-          from: new Date(Date.parse(val) - (dayOfWeek - 1) * this.dayInMillisecs),
-          to: new Date(Date.parse(val) + (7 - dayOfWeek) * this.dayInMillisecs)
+        if (val > this.selectedDays.from) {
+          if (val > this.selectedDays.to) {
+            this.selectedDays = {
+              from: this.selectedDays.from,
+              to: val
+            }
+          } else {
+            this.selectedDays = {
+              from: val,
+              to: this.selectedDays.from
+            }
+          }
+        } else {
+          this.selectedDays = {
+            from: val,
+            to: this.selectedDays.to
+          }
         }
       }
-      this.selectedDays = {
-        from: this.highlighted.from,
-        to: this.highlighted.to
-      }
-    },
-    setRangeDays (date) {
-      var dateCode = Date.parse(date)
-      this.highlighted = {
-        from: new Date(dateCode - ((this.presetRange - 1) * this.dayInMillisecs)),
-        to: date
-      }
-      this.selectedDays = {
-        from: new Date(dateCode - ((this.presetRange - 1) * this.dayInMillisecs)),
-        to: date
-      }
+      this.highlightDaysRange(this.selectedDays.to)
     },
     highlightTo (val) {
       if (typeof this.highlighted.to === 'undefined') {
@@ -312,12 +305,8 @@ export default {
           from: this.highlighted.from
         }
       }
-      if (this.presetRange > 0) {
-        this.setRangeDays(val)
-      } else {
-        this.highlighted.to = val
-        this.selectedDays.to = val
-      }
+      this.highlighted.to = val
+      this.selectedDays.to = val
     },
     highlightFrom (val) {
       if (typeof this.highlighted.from === 'undefined') {
